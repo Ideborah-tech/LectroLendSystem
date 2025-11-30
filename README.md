@@ -89,3 +89,64 @@ LectroLend uses the Model–View–DAO architecture for maintainability and scal
 | Maintainability      | Model–View–DAO pattern ensures easy debugging and future enhancements.      |
 | Portability          | Runs on Windows/Linux using the standard Java Runtime Environment (JRE).    |
 
+# ✅ LectroLend Validation Documentation
+
+This documentation outlines the complete set of Technical and Business validation rules implemented for the core tables in the LectroLend Equipment Booking System, ensuring data integrity and correct application flow.
+
+---
+
+## 1.  Users Table Validation
+
+| Rule Type | Field            | Rule Description                                               | Implementation Scope                                      |
+|----------|------------------|---------------------------------------------------------------|-----------------------------------------------------------|
+| Technical | username (PK)    | Uniqueness & Not Null: Username must be unique and cannot be null. | Database Constraint: `UNIQUE (username)`, `NOT NULL`      |
+| Technical | phone_number     | Format Check: Must be 8–15 digits (numeric only).             | DB Check: `CHECK (phone_number ~ '^[0-9]{8,15}$')`        |
+| Technical | role             | Allowed Values: staff, admin, student.                        | DB Check: `CHECK (role IN ('staff','admin','student'))`   |
+| Business  | password         | Security: Minimum 8 characters (before hashing).              | Java Validation: length check before hashing              |
+| Business  | department       | Required Field: Cannot be blank.                              | Java Validation: `!department.trim().isEmpty()`           |
+
+**Export to Sheets**
+
+---
+
+## 2.  Rooms Table Validation
+
+| Rule Type | Field              | Rule Description                                        | Implementation Scope                           |
+|-----------|--------------------|---------------------------------------------------------|------------------------------------------------|
+| Technical | room_number (PK)   | Format Check: Must be alphanumeric (e.g., B204).        | Java Validation: pattern `[A-Za-z0-9]{2,}`     |
+| Technical | capacity           | Range: Must be a positive integer.                      | Java Validation: `Integer.parseInt(capacity) > 0` |
+| Technical | room_type          | Allowed Values: classroom, lab, office.                 | DB Check: `CHECK (room_type IN (...))`         |
+| Business  | campus             | Selection Required: Cannot be default index.            | Java Validation: JComboBox index > 0           |
+| Business  | has_screen         | Explicit Selection: Must be Yes/No.                     | Java Validation: `ButtonGroup.getSelection() != null` |
+
+**Export to Sheets**
+
+---
+
+## 3.  Equipment Table Validation
+
+| Rule Type | Field      | Rule Description                                           | Implementation Scope                      |
+|-----------|------------|------------------------------------------------------------|-------------------------------------------|
+| Technical | id (PK)    | Format Check: Must match internal ID pattern.              | Java Validation: `String.matches()`       |
+| Technical | status     | Allowed Values: available, booked, damaged, maintenance.   | DB Check: `CHECK (status IN (...))`       |
+| Business  | name       | Uniqueness: Equipment name must be unique.                 | DB Constraint: `UNIQUE (name)`            |
+| Business  | campus     | Matching Check: Must match a valid campus name.            | Java Validation: checked against list      |
+
+**Export to Sheets**
+
+---
+
+## 4.  Bookings Table Validation
+
+| Rule Type | Field             | Rule Description                                                           | Implementation Scope                                                 |
+|-----------|-------------------|---------------------------------------------------------------------------|----------------------------------------------------------------------|
+| Technical | status            | Allowed Values: pending, approved, active, completed, cancelled.          | DB Check: `CHECK (status IN (...))`                                 |
+| Technical | end_time          | Temporal Order: Must be later than start_time.                            | DB Check: `CHECK (end_time > start_time)`                            |
+| Business  | start_time/end_time | Required: Valid HH:mm values must be provided.                           | Java Validation: `LocalTime.parse()` with try/catch                 |
+| Business  | username (FK)     | Foreign Key Check: User must exist in Users table.                        | Java Validation: checked against `usersTable` before DAO call        |
+| Business  | equipment         | Required: At least one equipment item must be selected.                   | Java Validation: checking selected list                              |
+| Business  | room (FK)         | Equipment–Room Logic: Cannot book projector if room already has screen.   | Java Validation: filters equipment using room `has_screen`           |
+| Business  | Time fields       | Conflict Prevention: Avoid overlapping bookings.                           | DAO SQL overlap check (implied)                                      |
+
+
+
