@@ -102,10 +102,7 @@ This documentation outlines the complete set of Technical and Business validatio
 | Technical | username (PK)    | Uniqueness & Not Null: Username must be unique and cannot be null. | Database Constraint: `UNIQUE (username)`, `NOT NULL`      |
 | Technical | phone_number     | Format Check: Must be 8–15 digits (numeric only).             | DB Check: `CHECK (phone_number ~ '^[0-9]{8,15}$')`        |
 | Technical | role             | Allowed Values: staff, admin, student.                        | DB Check: `CHECK (role IN ('staff','admin','student'))`   |
-| Business  | password         | Security: Minimum 8 characters (before hashing).              | Java Validation: length check before hashing              |
 | Business  | department       | Required Field: Cannot be blank.                              | Java Validation: `!department.trim().isEmpty()`           |
-
-**Export to Sheets**
 
 ---
 
@@ -119,7 +116,6 @@ This documentation outlines the complete set of Technical and Business validatio
 | Business  | campus             | Selection Required: Cannot be default index.            | Java Validation: JComboBox index > 0           |
 | Business  | has_screen         | Explicit Selection: Must be Yes/No.                     | Java Validation: `ButtonGroup.getSelection() != null` |
 
-**Export to Sheets**
 
 ---
 
@@ -132,7 +128,6 @@ This documentation outlines the complete set of Technical and Business validatio
 | Business  | name       | Uniqueness: Equipment name must be unique.                 | DB Constraint: `UNIQUE (name)`            |
 | Business  | campus     | Matching Check: Must match a valid campus name.            | Java Validation: checked against list      |
 
-**Export to Sheets**
 
 ---
 
